@@ -30,7 +30,6 @@
     </div>
     
     <script>
-      var targetSize = 25;
       
       class BallView {
           constructor(container, props, model){
@@ -131,15 +130,15 @@
             this.container.style.transform = transform
           }
           makeTriangle({x, y, s, children}){
-            if( s<= targetSize){
+            if( s<= this.model.targetSize){
                 var div = document.createElement("div")
                 div.innerText = children
                 div.className = "ball"
                 this.container.appendChild(div)
                 var ball = new BallView(div, {
-                  x: x - (targetSize / 2),
-                  y: y - (targetSize / 2),
-                  size: targetSize,
+                  x: x - (this.model.targetSize / 2),
+                  y: y - (this.model.targetSize / 2),
+                  size: this.model.targetSize,
                   text: children}, makeObservable({hover: false}))
                 this.model.observe("seconds", ball)
                 ball.render()
@@ -169,7 +168,7 @@
       }
 
       var start = new Date().getTime();
-      var model = makeObservable({elapsed: new Date().getTime() - start, seconds: 0})
+      var model = makeObservable({elapsed: new Date().getTime() - start, seconds: 0, targetSize: 25})
       var triangle = document.getElementById("bam").querySelector(".triangle")
       var app = new App(triangle, model)
       app.render()
