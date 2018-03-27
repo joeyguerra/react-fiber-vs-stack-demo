@@ -4,33 +4,32 @@
     <meta charset="utf-8">
     <title>Example</title>
     <link rel="stylesheet" href="css/base.css" />
+    <style>
+        #bam{
+            position: absolute;
+            transform-origin: 0 0;
+            left: 50%;
+            top: 50%;
+            width: 10px;
+            height: 10px;
+            background: #eee;
+        }
+        .ball {
+            position: absolute;
+            background: #61dafb;
+            font: normal 15px sans-serif;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
   </head>
   <body>
-    <h1>Example</h1>
+    <h1>Just Plain Ol' Javascript Implementing Design Patterns Example</h1>
     <div id="bam">
         <div class="triangle"></div>
     </div>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.min.js"></script>
-    <script type="text/babel">
-      var dotStyle = {
-        position: 'absolute',
-        background: '#61dafb',
-        font: 'normal 15px sans-serif',
-        textAlign: 'center',
-        cursor: 'pointer',
-      };
-
-      var containerStyle = {
-        position: 'absolute',
-        transformOrigin: '0 0',
-        left: '50%',
-        top: '50%',
-        width: '10px',
-        height: '10px',
-        background: '#eee',
-      };
-
+    <script>
       var targetSize = 25;
       
       class BallView {
@@ -42,6 +41,9 @@
               this.container.addEventListener("mouseout", this, true)
               this.model = model
               this.model.observe("hover", this)
+              this.defaultStyle = {
+                  background: this.container.style["background"]
+              }
           }
           handleEvent(e){
               if(this[e.type]) this[e.type](e)
@@ -53,7 +55,7 @@
               this.model.hover = false
           }
           update(key, old, value, m){
-              if(key === "hover") this.container.style["background-color"] = value ? "#ff0" : dotStyle.background
+              if(key === "hover") this.container.style["background-color"] = value ? "#ff0" : this.defaultStyle.background
               if(key === "seconds"){
                   this.container.innerText = value
               }
@@ -62,14 +64,13 @@
             var props = this.props
             var s = props.size * 1.3
             var style = {
-                ...dotStyle,
                 width: s + 'px',
                 height: s + 'px',
                 left: (props.x) + 'px',
                 top: (props.y) + 'px',
                 borderRadius: (s / 2) + 'px',
                 lineHeight: (s) + 'px',
-                background: this.model.hover ? '#ff0' : dotStyle.background
+                background: this.model.hover ? '#ff0' : this.defaultStyle.background
             }
             for(var key in style){
                 this.container.style[key] = style[key]
@@ -120,13 +121,9 @@
               this.container = container
               this.model = model
               this.model.observe("elapsed", this)
-              for(var key in containerStyle){
-                  this.container.style[key] = containerStyle[key]
-              }
           }
           update(key, old, value, m){
             if(key !== "elapsed") return
-
             const elapsed = m.elapsed
             const t = (elapsed / 1000) % 10
             const scale = 1 + (t > 5 ? 10 - t : t) / 10
@@ -137,6 +134,7 @@
             if( s<= targetSize){
                 var div = document.createElement("div")
                 div.innerText = children
+                div.className = "ball"
                 this.container.appendChild(div)
                 var ball = new BallView(div, {
                   x: x - (targetSize / 2),
