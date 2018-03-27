@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html style="width: 100%; height: 100%; overflow: hidden">
+  <head>
+    <meta charset="utf-8">
+    <title>Example</title>
+    <link rel="stylesheet" href="css/base.css" />
+  </head>
+  <body>
+    <h1>Example</h1>
+    <div id="bam">
+        <div class="triangle"></div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.min.js"></script>
+    <script type="text/babel">
+      var dotStyle = {
+        position: 'absolute',
+        background: '#61dafb',
+        font: 'normal 15px sans-serif',
+        textAlign: 'center',
+        cursor: 'pointer',
+      };
+
+      var containerStyle = {
+        position: 'absolute',
+        transformOrigin: '0 0',
+        left: '50%',
+        top: '50%',
+        width: '10px',
+        height: '10px',
+        background: '#eee',
+      };
+
+      var targetSize = 25;
+      
+      class BallView {
+          constructor(container, props, model){
+              this.state = { hover: false }
+              this.props = props
+              this.container = container
+              this.container.addEventListener("mouseover", this, true)
+              this.container.addEventListener("mouseout", this, true)
+              this.model = model
+              this.model.observe("hover", this)
+          }
+          handleEvent(e){
+              if(this[e.type]) this[e.type](e)
+          }
+          mouseover(e){
+              this.model.hover = true
+          }
+          mouseout(e){
+              this.model.hover = false
+          }
+          update(key, old, value, m){
+              if(key === "hover") this.container.style["background-color"] = value ? "#ff0" : dotStyle.background
+              if(key === "seconds"){
+                  this.container.innerText = value
+              }
+          }
+          render(){
+            var props = this.props
+            var s = props.size * 1.3
+            var style = {
+                ...dotStyle,
+                width: s + 'px',
+                height: s + 'px',
+                left: (props.x) + 'px',
+                top: (props.y) + 'px',
+                borderRadius: (s / 2) + 'px',
+                lineHeight: (s) + 'px',
+                background: this.model.hover ? '#ff0' : dotStyle.background
+            }
+            for(var key in style){
+                this.container.style[key] = style[key]
+            }
+          }
+      }
+
+
+      function makeObservable(obj){
+          var observers = {}
+          var self = {
+              observe(key, observer){
+                  if(!observers[key]) observers[key] = []
+                  observers[key].push(observer)
+              },
+              changed(key, old, value){
+                  if(observers[key]){
+                      observers[key].forEach(o => {
+                          o.update(key, old, value, this)
+                      })
+                  }
+              }
+          }
+          var keys = Object.keys(obj)
+          var ubounds = keys.length
+          for(var i = 0; i < ubounds; i++){
+              (()=>{
+                var prop = keys[i]
+                Object.defineProperty(self, prop, {
+                  get(){
+                      return obj[prop]
+                  },
+                  set(v){
+                      var old = obj[prop]
+                      obj[prop] = v
+                      self.changed(prop, old, v)
+                  },
+                  enumerable: true
+                })
+
+              })()
+
+          }
+          return self
+      }
+      class App {
+          constructor(container, model){
+              this.container = container
+              this.model = model
+              this.model.observe("elapsed", this)
+              for(var key in containerStyle){
+                  this.container.style[key] = containerStyle[key]
+              }
+          }
+          update(key, old, value, m){
+            if(key !== "elapsed") return
+
+            const elapsed = m.elapsed
+            const t = (elapsed / 1000) % 10
+            const scale = 1 + (t > 5 ? 10 - t : t) / 10
+            const transform = 'scaleX(' + (scale / 2.1) + ') scaleY(0.7) translateZ(0.1px)'
+            this.container.style.transform = transform
+          }
+          makeTriangle({x, y, s, children}){
+            if( s<= targetSize){
+                var div = document.createElement("div")
+                div.innerText = children
+                this.container.appendChild(div)
+                var ball = new BallView(div, {
+                  x: x - (targetSize / 2),
+                  y: y - (targetSize / 2),
+                  size: targetSize,
+                  text: children}, makeObservable({hover: false}))
+                this.model.observe("seconds", ball)
+                ball.render()
+                return ball
+            }
+            var newSize = s /2
+            var slowDown = true
+            if(slowDown){
+                var e = performance.now() + .8
+                while(performance.now() < e){}
+            }
+            s /= 2
+            return [
+                this.makeTriangle({x: x, y: y-(s /2), s: s, children: children}),
+                this.makeTriangle({x: x-s, y: y+(s /2), s: s, children: children}),
+                this.makeTriangle({x: x+s, y: y+(s /2), s: s, children: children})
+            ]
+
+          }
+          render(){
+            this.makeTriangle({x: 0, y: 0, s: 1000, children: this.model.seconds})
+            this.intervalId = setInterval(this.tick.bind(this), 1000)
+          }
+          tick(){
+              this.model.seconds = (this.model.seconds % 10) + 1
+          }
+      }
+
+      var start = new Date().getTime();
+      var model = makeObservable({elapsed: new Date().getTime() - start, seconds: 0})
+      var triangle = document.getElementById("bam").querySelector(".triangle")
+      var app = new App(triangle, model)
+      app.render()
+      function update(){
+        model.elapsed = new Date().getTime() - start
+        requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    </script>
+  </body>
+</html>
