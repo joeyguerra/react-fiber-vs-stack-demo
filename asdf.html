@@ -22,6 +22,7 @@
             cursor: pointer;
         }
     </style>
+    <script src="js/observable.js"></script>
   </head>
   <body>
     <h1>Just Plain Ol' Javascript Implementing Design Patterns Example</h1>
@@ -77,46 +78,8 @@
           }
       }
 
-
-      function makeObservable(obj){
-          var observers = {}
-          var self = {
-              observe(key, observer){
-                  if(!observers[key]) observers[key] = []
-                  observers[key].push(observer)
-              },
-              changed(key, old, value){
-                  if(observers[key]){
-                      observers[key].forEach(o => {
-                          o.update(key, old, value, this)
-                      })
-                  }
-              }
-          }
-          var keys = Object.keys(obj)
-          var ubounds = keys.length
-          for(var i = 0; i < ubounds; i++){
-              (()=>{
-                var prop = keys[i]
-                Object.defineProperty(self, prop, {
-                  get(){
-                      return obj[prop]
-                  },
-                  set(v){
-                      var old = obj[prop]
-                      obj[prop] = v
-                      self.changed(prop, old, v)
-                  },
-                  enumerable: true
-                })
-
-              })()
-
-          }
-          return self
-      }
       class App {
-          constructor(container, model){
+          constructor(container, model, window){
               this.container = container
               this.model = model
               this.model.observe("elapsed", this)
@@ -139,7 +102,7 @@
                   x: x - (this.model.targetSize / 2),
                   y: y - (this.model.targetSize / 2),
                   size: this.model.targetSize,
-                  text: children}, makeObservable({hover: false}))
+                  text: children}, window.makeObservable({hover: false}))
                 this.model.observe("seconds", ball)
                 ball.render()
                 return ball
@@ -168,9 +131,9 @@
       }
 
       var start = new Date().getTime();
-      var model = makeObservable({elapsed: new Date().getTime() - start, seconds: 0, targetSize: 25})
+      var model = window.makeObservable({elapsed: new Date().getTime() - start, seconds: 0, targetSize: 25})
       var triangle = document.getElementById("bam").querySelector(".triangle")
-      var app = new App(triangle, model)
+      var app = new App(triangle, model, window)
       app.render()
       function update(){
         model.elapsed = new Date().getTime() - start
