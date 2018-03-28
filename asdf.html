@@ -21,6 +21,9 @@
             text-align: center;
             cursor: pointer;
         }
+        .ball:hover{
+            background: #ff0;
+        }
     </style>
     <script src="js/observable.js"></script>
   </head>
@@ -31,31 +34,21 @@
     </div>
     
     <script>
-      
+      class UpdateCommand {
+        constructor(model, data){
+            this.data = data
+            this.model = model
+        }
+      }
       class BallView {
-          constructor(container, props, model){
+          constructor(delegate, container, props, model){
+              this.delegate = delegate
               this.state = { hover: false }
               this.props = props
               this.container = container
-              this.container.addEventListener("mouseover", this, true)
-              this.container.addEventListener("mouseout", this, true)
               this.model = model
-              this.model.observe("hover", this)
-              this.defaultStyle = {
-                  background: this.container.style["background"]
-              }
-          }
-          handleEvent(e){
-              if(this[e.type]) this[e.type](e)
-          }
-          mouseover(e){
-              this.model.hover = true
-          }
-          mouseout(e){
-              this.model.hover = false
           }
           update(key, old, value, m){
-              if(key === "hover") this.container.style["background-color"] = value ? "#ff0" : this.defaultStyle.background
               if(key === "seconds"){
                   this.container.innerText = value
               }
@@ -69,8 +62,7 @@
                 left: (props.x) + 'px',
                 top: (props.y) + 'px',
                 borderRadius: (s / 2) + 'px',
-                lineHeight: (s) + 'px',
-                background: this.model.hover ? '#ff0' : this.defaultStyle.background
+                lineHeight: (s) + 'px'
             }
             for(var key in style){
                 this.container.style[key] = style[key]
@@ -83,6 +75,26 @@
               this.container = container
               this.model = model
               this.model.observe("elapsed", this)
+              this.queue = {
+                  UpdateCommand: []
+              }
+              this.intervalId = null
+          }
+          start(){
+            this.intervalId = setInterval(()=>{
+                let command = null
+                while(command = this.queue["UpdateCommand"].shift()){
+                    for(let prop in command.data){
+                        command.model[prop] = command.data[prop]
+                    }
+                }
+            }, 60)
+          }
+          stop(){
+              clearInterval(this.intervalId)
+          }
+          send(command){
+              this.queue[Reflect.getPrototypeOf(command).constructor.name].push(command)
           }
           update(key, old, value, m){
             if(key !== "elapsed") return
@@ -98,7 +110,7 @@
                 div.innerText = children
                 div.className = "ball"
                 this.container.appendChild(div)
-                var ball = new BallView(div, {
+                var ball = new BallView(this, div, {
                   x: x - (this.model.targetSize / 2),
                   y: y - (this.model.targetSize / 2),
                   size: this.model.targetSize,
@@ -126,7 +138,7 @@
             this.intervalId = setInterval(this.tick.bind(this), 1000)
           }
           tick(){
-              this.model.seconds = (this.model.seconds % 10) + 1
+              this.send(new UpdateCommand(this.model, {seconds: (this.model.seconds % 10) + 1}))
           }
       }
 
@@ -135,6 +147,7 @@
       var triangle = document.getElementById("bam").querySelector(".triangle")
       var app = new App(triangle, model, window)
       app.render()
+      app.start()
       function update(){
         model.elapsed = new Date().getTime() - start
         requestAnimationFrame(update);

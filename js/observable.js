@@ -25,7 +25,7 @@ if(!module){
         for(var i = 0; i < ubounds; i++){
             (()=>{
               var prop = keys[i]
-              Object.defineProperty(self, prop, {
+              Reflect.defineProperty(self, prop, {
                 get(){
                     return obj[prop]
                 },
