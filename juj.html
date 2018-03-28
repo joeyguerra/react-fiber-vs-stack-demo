@@ -104,7 +104,7 @@
             const transform = 'scaleX(' + (scale / 2.1) + ') scaleY(0.7) translateZ(0.1px)'
             this.container.style.transform = transform
           }
-          makeTriangle({x, y, s, children}){
+          maikeSierpinskiTriangle({x, y, s, children}){
             if( s<= this.model.targetSize){
                 var div = document.createElement("div")
                 div.innerText = children
@@ -127,14 +127,14 @@
             }
             s /= 2
             return [
-                this.makeTriangle({x: x, y: y-(s /2), s: s, children: children}),
-                this.makeTriangle({x: x-s, y: y+(s /2), s: s, children: children}),
-                this.makeTriangle({x: x+s, y: y+(s /2), s: s, children: children})
+                this.maikeSierpinskiTriangle({x: x, y: y-(s /2), s: s, children: children}),
+                this.maikeSierpinskiTriangle({x: x-s, y: y+(s /2), s: s, children: children}),
+                this.maikeSierpinskiTriangle({x: x+s, y: y+(s /2), s: s, children: children})
             ]
 
           }
           render(){
-            this.makeTriangle({x: 0, y: 0, s: 1000, children: this.model.seconds})
+            this.maikeSierpinskiTriangle({x: 0, y: 0, s: 1000, children: this.model.seconds})
             this.intervalId = setInterval(this.tick.bind(this), 1000)
           }
           tick(){
