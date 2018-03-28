@@ -104,20 +104,23 @@
             const transform = 'scaleX(' + (scale / 2.1) + ') scaleY(0.7) translateZ(0.1px)'
             this.container.style.transform = transform
           }
+          createBall({x, y, s, children}){
+            var div = document.createElement("div")
+            div.innerText = children
+            div.className = "ball"
+            this.container.appendChild(div)
+            var ball = new BallView(this, div, {
+                x: x - (this.model.targetSize / 2),
+                y: y - (this.model.targetSize / 2),
+                size: this.model.targetSize,
+                text: children}, window.makeObservable({hover: false}))
+            this.model.observe("seconds", ball)
+            ball.render()
+            return ball
+          }
           maikeSierpinskiTriangle({x, y, s, children}){
             if( s<= this.model.targetSize){
-                var div = document.createElement("div")
-                div.innerText = children
-                div.className = "ball"
-                this.container.appendChild(div)
-                var ball = new BallView(this, div, {
-                  x: x - (this.model.targetSize / 2),
-                  y: y - (this.model.targetSize / 2),
-                  size: this.model.targetSize,
-                  text: children}, window.makeObservable({hover: false}))
-                this.model.observe("seconds", ball)
-                ball.render()
-                return ball
+                return this.createBall({x, y, s, children})
             }
             var newSize = s /2
             var slowDown = true
