@@ -125,7 +125,6 @@
                 this.maikeSierpinskiTriangle({x: x-s, y: y+(s /2), s: s, children: children}),
                 this.maikeSierpinskiTriangle({x: x+s, y: y+(s /2), s: s, children: children})
             ]
-
           }
           render(){
             this.maikeSierpinskiTriangle({x: 0, y: 0, s: 1000, children: this.model.seconds})
@@ -138,8 +137,7 @@
 
       var start = new Date().getTime();
       var model = window.makeObservable({elapsed: new Date().getTime() - start, seconds: 0, targetSize: 25})
-      var triangle = document.getElementById("bam").querySelector(".triangle")
-      var app = new App(triangle, model, window)
+      var app = new App(document.getElementById("bam").querySelector(".triangle"), model, window)
       app.render()
       app.start()
       function update(){
