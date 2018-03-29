@@ -41,9 +41,7 @@
         }
       }
       class BallView {
-          constructor(container, props, model){
-              this.state = { hover: false }
-              this.props = props
+          constructor(container, model){
               this.container = container
               this.model = model
           }
@@ -53,13 +51,12 @@
               }
           }
           render(){
-            var props = this.props
-            var s = props.size * 1.3
+            var s = this.model.size * 1.3
             var style = {
                 width: s + 'px',
                 height: s + 'px',
-                left: (props.x) + 'px',
-                top: (props.y) + 'px',
+                left: (this.model.x) + 'px',
+                top: (this.model.y) + 'px',
                 borderRadius: (s / 2) + 'px',
                 lineHeight: (s) + 'px'
             }
@@ -108,11 +105,11 @@
             div.innerText = children
             div.className = "ball"
             this.container.appendChild(div)
-            var ball = new BallView(div, {
+            var ball = new BallView(div, window.makeObservable({
                 x: x - (this.model.targetSize / 2),
                 y: y - (this.model.targetSize / 2),
                 size: this.model.targetSize,
-                text: children}, window.makeObservable({hover: false}))
+                text: children}))
             this.model.observe("seconds", ball)
             ball.render()
             return ball
