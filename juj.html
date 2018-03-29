@@ -41,8 +41,7 @@
         }
       }
       class BallView {
-          constructor(delegate, container, props, model){
-              this.delegate = delegate
+          constructor(container, props, model){
               this.state = { hover: false }
               this.props = props
               this.container = container
@@ -109,7 +108,7 @@
             div.innerText = children
             div.className = "ball"
             this.container.appendChild(div)
-            var ball = new BallView(this, div, {
+            var ball = new BallView(div, {
                 x: x - (this.model.targetSize / 2),
                 y: y - (this.model.targetSize / 2),
                 size: this.model.targetSize,
