@@ -41,16 +41,16 @@
         }
       }
       class BallView {
-          constructor(container, model){
-              this.container = container
-              this.model = model
-          }
-          update(key, old, value, m){
-              if(key === "seconds"){
-                  this.container.innerText = value
-              }
-          }
-          render(){
+        constructor(container, model){
+            this.container = container
+            this.model = model
+        }
+        update(key, old, value, m){
+            if(key === "seconds"){
+                this.container.innerText = value
+            }
+        }
+        render(){
             var s = this.model.size * 1.3
             var style = {
                 width: s + 'px',
@@ -63,20 +63,20 @@
             for(var key in style){
                 this.container.style[key] = style[key]
             }
-          }
+        }
       }
 
       class App {
-          constructor(container, model, window){
-              this.container = container
-              this.model = model
-              this.model.observe("elapsed", this)
-              this.queue = {
-                  UpdateCommand: []
-              }
-              this.intervalId = null
-          }
-          start(){
+        constructor(container, model, window){
+            this.container = container
+            this.model = model
+            this.model.observe("elapsed", this)
+            this.queue = {
+                UpdateCommand: []
+            }
+            this.intervalId = null
+        }
+        start(){
             this.intervalId = setInterval(()=>{
                 let command = null
                 while(command = this.queue["UpdateCommand"].shift()){
@@ -85,28 +85,28 @@
                     }
                 }
             }, 60)
-          }
-          stop(){
-              clearInterval(this.intervalId)
-          }
-          send(command){
-              this.queue[Reflect.getPrototypeOf(command).constructor.name].push(command)
-          }
-          update(key, old, value, m){
+        }
+        stop(){
+            clearInterval(this.intervalId)
+        }
+        send(command){
+            this.queue[Reflect.getPrototypeOf(command).constructor.name].push(command)
+        }
+        update(key, old, value, m){
             if(key !== "elapsed") return
             const elapsed = m.elapsed
             const t = (elapsed / 1000) % 10
             const scale = 1 + (t > 5 ? 10 - t : t) / 10
             const transform = 'scaleX(' + (scale / 2.1) + ') scaleY(0.7) translateZ(0.1px)'
             this.container.style.transform = transform
-          }
-          createDiv(children){
+        }
+        createDiv(children){
             var div = document.createElement("div")
             div.innerText = children
             div.className = "ball"
             return div
-          }
-          createBall({x, y, s, children}){
+        }
+        addBall({x, y, s, children}){
             var div = this.createDiv(children)
             this.container.appendChild(div)
             var ball = new BallView(div, window.makeObservable({
@@ -117,26 +117,26 @@
             this.model.observe("seconds", ball)
             ball.render()
             return ball
-          }
-          maikeSierpinskiTriangle({x, y, s, children}){
+        }
+        maikeSierpinskiTriangle({x, y, s, children}){
             if( s<= this.model.targetSize){
-                return this.createBall({x, y, s, children})
+                return this.addBall({x, y, s, children})
             }
-            var newSize = s /2
+            var newSize = s / 2
             s /= 2
             return [
-                this.maikeSierpinskiTriangle({x: x, y: y-(s /2), s: s, children: children}),
-                this.maikeSierpinskiTriangle({x: x-s, y: y+(s /2), s: s, children: children}),
-                this.maikeSierpinskiTriangle({x: x+s, y: y+(s /2), s: s, children: children})
+                this.maikeSierpinskiTriangle({x: x, y: y - (s / 2), s: s, children: children}),
+                this.maikeSierpinskiTriangle({x: x-s, y: y + (s / 2), s: s, children: children}),
+                this.maikeSierpinskiTriangle({x: x+s, y: y + (s / 2), s: s, children: children})
             ]
-          }
-          render(){
+        }
+        render(){
             this.maikeSierpinskiTriangle({x: 0, y: 0, s: 1000, children: this.model.seconds})
             this.intervalId = setInterval(this.tick.bind(this), 1000)
-          }
-          tick(){
-              this.send(new UpdateCommand(this.model, {seconds: (this.model.seconds % 10) + 1}))
-          }
+        }
+        tick(){
+            this.send(new UpdateCommand(this.model, {seconds: (this.model.seconds % 10) + 1}))
+        }
       }
 
       var start = new Date().getTime();
