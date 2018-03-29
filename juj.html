@@ -100,10 +100,14 @@
             const transform = 'scaleX(' + (scale / 2.1) + ') scaleY(0.7) translateZ(0.1px)'
             this.container.style.transform = transform
           }
-          createBall({x, y, s, children}){
+          createDiv(children){
             var div = document.createElement("div")
             div.innerText = children
             div.className = "ball"
+            return div
+          }
+          createBall({x, y, s, children}){
+            var div = this.createDiv(children)
             this.container.appendChild(div)
             var ball = new BallView(div, window.makeObservable({
                 x: x - (this.model.targetSize / 2),
