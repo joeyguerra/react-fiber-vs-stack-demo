@@ -119,11 +119,6 @@
                 return this.createBall({x, y, s, children})
             }
             var newSize = s /2
-            var slowDown = true
-            if(slowDown){
-                var e = performance.now() + .8
-                while(performance.now() < e){}
-            }
             s /= 2
             return [
                 this.maikeSierpinskiTriangle({x: x, y: y-(s /2), s: s, children: children}),
