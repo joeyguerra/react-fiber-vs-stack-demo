@@ -5,7 +5,7 @@ This demo shows the differences between Stack and Fiber by rendering a Sierpinsk
 Used as a demo during the ReactJS Dublin Lightning Talks meetup of February 22nd 2017.
 
 * [React Fiber](https://cdn.rawgit.com/joeyguerra/react-fiber-vs-stack-demo/master/fiber.html)
-* [Sack](https://cdn.rawgit.com/joeyguerra/react-fiber-vs-stack-demo/master/stack.html)
+* [Stack](https://cdn.rawgit.com/joeyguerra/react-fiber-vs-stack-demo/master/stack.html)
 * [Just Javascript](https://cdn.rawgit.com/joeyguerra/react-fiber-vs-stack-demo/master/juj.html)
 
 ## License
