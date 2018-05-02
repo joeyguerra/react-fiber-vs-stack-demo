@@ -1,6 +1,6 @@
 # React Fiber vs Stack Demo
 
-This demo shows the differences between Stack and Fiber by rendering a Sierpinski triangle that constantly shrinks and grows, and whose nodes have a value that increments by one every second.
+This [demo](https://cdn.rawgit.com/joeyguerra/react-fiber-vs-stack-demo/master/juj.html) shows the differences between Stack and Fiber by rendering a Sierpinski triangle that constantly shrinks and grows, and whose nodes have a value that increments by one every second.
 
 Used as a demo during the ReactJS Dublin Lightning Talks meetup of February 22nd 2017.
 
